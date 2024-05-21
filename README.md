@@ -1,2 +1,2 @@
 # Tickest
- Projeto TCC (Web) - FATEC
+ Projeto TCC (App) - FATEC
