@@ -10,7 +10,7 @@ import CriarTicket from './CriarTicket';
 import Historico from './Historico';
 
 
-const TabArr = [ 
+const TabArr = [
   {
     route: 'Home', // Nome da rota
     label: 'Home', // Texto do menu
@@ -56,8 +56,8 @@ const TabButton = (props) => {
       });
     } else {
       viewRef.current.animate({
-        0: { scale: 1.2},
-        1: { scale: 1},
+        0: { scale: 1.2 },
+        1: { scale: 1 },
       });
     }
   }, [focused]);
@@ -71,7 +71,7 @@ const TabButton = (props) => {
       <Animatable.View ref={viewRef} duration={150}>
         <Ionicons
           name={focused ? item.activeIcon : item.inActiveIcon}
-          color= '#696CFF' size={20}
+          color='#696CFF' size={20}
         />
       </Animatable.View>
     </TouchableOpacity>
@@ -91,11 +91,13 @@ export default function Menu() {
             borderRadius: 16,
             justifyContent: 'center',
             alignItems: 'center',
-            backgroundColor: '#F6F6F6',
+            backgroundColor: 'white',
             borderColor: '#696CFF',
             borderWidth: 1,
             borderTopWidth: 1,
             shadowColor: 'white',
+            width: "70%",
+            marginLeft: 59
           },
         }}
       >
