@@ -89,7 +89,7 @@ const styles = StyleSheet.create({
         marginLeft: 10,
     },
     ticketContainer: {
-        paddingHorizontal: 15,
+        paddingHorizontal: 25,
         paddingVertical: 20,
     },
     section: {
