@@ -23,16 +23,6 @@ export default function Login() {
         navigation.navigate("Tabs");
       }else{
         console.log("Não Entrou!")
-      //   toast.show(userData.message, {
-      //     type: "warning",
-      //     placement: "bottom",
-      //     duration: 2000,
-      //     offset: 30,
-      //     animationType: "fade",
-      //     textStyle: { color: 'white' },
-      //     backgroundColor: "#FF5722",
-      //     icon: <Ionicons name="heart-outline" size={24} color="white" />
-      // });
       }
     } catch(error) {
       console.error("Erro ao fazer login:", error);
@@ -82,7 +72,7 @@ export default function Login() {
           <Text style={styles.labelCheckbox}>Lembrar senha</Text>
         </View>
 
-        <TouchableOpacity style={styles.botaoLogin}>
+        <TouchableOpacity style={styles.botaoLogin} onPress={buttonLogin}>
           <Text style={styles.textoBotao}>Entrar</Text>
         </TouchableOpacity>
 

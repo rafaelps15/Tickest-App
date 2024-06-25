@@ -4,15 +4,13 @@ import { SafeAreaView } from 'react-native-safe-area-context';
 import { PaperProvider } from 'react-native-paper';
 import { AuthProvider } from './services/AuthContext';
 
-
-
 export default function App() {
   return (
     <AuthProvider>
       <PaperProvider>
         <SafeAreaView style={{ flex: 1 }}>
           <StatusBar backgroundColor= {'#696CFF'}  />
-          <Routes/>
+          <Routes />
         </SafeAreaView>
       </PaperProvider>
     </AuthProvider>
