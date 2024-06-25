@@ -1,12 +1,44 @@
-import React, { useState } from "react";
+import React, { useContext, useState } from "react";
 import { Text, View, StyleSheet, TextInput, TouchableOpacity, Image, StatusBar, Pressable } from "react-native";
 import { Checkbox } from "react-native-paper";
 import { Ionicons } from "@expo/vector-icons";
 import { getStatusBarHeight } from "react-native-status-bar-height";
+import { getLogin } from "../../services/GetUser";
+import { AuthContext } from "../../services/AuthContext";
+import { useNavigation } from "@react-navigation/native";
 
-export default function Login({ navigation }) {
+export default function Login() {
   const [lembrarSenha, setLembrarSenha] = useState(false);
   const [senhaVisivel, setSenhaVisivel] = useState(false);
+  const [email, setEmail] = useState('');
+  const [password, setPassword] = useState('');
+  const { signIn } = useContext(AuthContext);
+  const navigation = useNavigation();
+  const buttonLogin = async() => {
+    try{
+      const userData = await getLogin(email,password);
+      if(!userData.message){
+        console.log("Usuário encontrado:", userData);
+        signIn(userData);
+        navigation.navigate("Tabs");
+      }else{
+        console.log("Não Entrou!")
+      //   toast.show(userData.message, {
+      //     type: "warning",
+      //     placement: "bottom",
+      //     duration: 2000,
+      //     offset: 30,
+      //     animationType: "fade",
+      //     textStyle: { color: 'white' },
+      //     backgroundColor: "#FF5722",
+      //     icon: <Ionicons name="heart-outline" size={24} color="white" />
+      // });
+      }
+    } catch(error) {
+      console.error("Erro ao fazer login:", error);
+      Alert.alert("Erro", "Usuário não existe ou senha está incorreta!");
+    }
+  };
 
   return (
     <View style={styles.container}>
@@ -20,6 +52,8 @@ export default function Login({ navigation }) {
         <TextInput
           style={styles.entrada}
           placeholder="E-mail"
+          value={email}
+          onChangeText={setEmail}
           keyboardType="email-address"
           autoCapitalize="none"
           placeholderTextColor="#A5A5A5"
@@ -29,6 +63,8 @@ export default function Login({ navigation }) {
           <TextInput
             style={[styles.entrada, styles.entradaSenha]}
             placeholder="Senha"
+            value={password}
+            onChangeText={setPassword} 
             secureTextEntry={!senhaVisivel}
             placeholderTextColor="#A5A5A5"
           />
@@ -46,7 +82,7 @@ export default function Login({ navigation }) {
           <Text style={styles.labelCheckbox}>Lembrar senha</Text>
         </View>
 
-        <TouchableOpacity style={styles.botaoLogin} onPress={() => navigation.navigate("Tabs")}>
+        <TouchableOpacity style={styles.botaoLogin}>
           <Text style={styles.textoBotao}>Entrar</Text>
         </TouchableOpacity>
 

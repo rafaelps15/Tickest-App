@@ -4,7 +4,6 @@ import Ionicons from '@expo/vector-icons/Ionicons'
 import { useSafeAreaInsets } from 'react-native-safe-area-context'
 import Resumo from './Resumo'
 import { Ticket } from '../components/ticket'
-import { getStatusBarHeight } from "react-native-status-bar-height";
 import { StatusBar } from 'expo-status-bar'
 
 const Home = () => {
