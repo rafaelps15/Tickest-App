@@ -1,5 +1,5 @@
-import React from "react";
-import { Pressable, ScrollView, StatusBar, StyleSheet, Text, View, TouchableOpacity } from "react-native";
+import React, { useState } from "react";
+import { ScrollView, StatusBar, StyleSheet, Text, View, TouchableOpacity, Alert } from "react-native";
 import Ionicons from '@expo/vector-icons/Ionicons';
 
 export default function ExibirTicket({ route, navigation }) {
@@ -9,6 +9,29 @@ export default function ExibirTicket({ route, navigation }) {
         { nome: "Anexo.zip", url: "https://example.com/anexo1.pdf" },
         { nome: "Anexo.docx", url: "https://example.com/anexo2.pdf" }
     ];
+
+    const [showChatBalloon, setShowChatBalloon] = useState(false);
+
+    const handleAssumirTicket = () => {
+        Alert.alert(
+            'Deseja assumir este ticket?',
+            'Você tem certeza que deseja assumir este ticket?',
+            [
+                {
+                    text: 'Cancelar',
+                    onPress: () => console.log('Cancelado'),
+                    style: 'cancel'
+                },
+                {
+                    text: 'Sim',
+                    onPress: () => {
+                        setShowChatBalloon(true);
+                        Alert.alert('Ticket assumido!', 'Você assumiu o ticket com sucesso!');
+                    }
+                }
+            ]
+        );
+    };
 
     return (
         <View style={styles.container}>
@@ -25,7 +48,10 @@ export default function ExibirTicket({ route, navigation }) {
                     <Text style={styles.subtitulo}>Criado em: <Text style={styles.data}>24/05/2024</Text></Text>
                 </View>
                 <View style={styles.section}>
-                    <Text style={styles.subtitulo}>Criado por: <Text style={styles.autor}>Josiney Cléverson</Text></Text>
+                    <Text style={styles.subtitulo}>Criado por: <Text style={styles.autor}>Maria Alberto</Text></Text>
+                </View>
+                <View style={styles.section}>
+                    <Text style={styles.subtitulo}>Status: <Text style={styles.data}>Em análise</Text></Text>
                 </View>
                 <View style={styles.section}>
                     <Text style={styles.descricao}>Descrição</Text>
@@ -33,12 +59,10 @@ export default function ExibirTicket({ route, navigation }) {
                 <View style={styles.descricaoContainer}>
                     <ScrollView contentContainerStyle={styles.descricaoScrollContent}>
                         <Text style={styles.descricaoTexto}>
-                            Contrary to popular belief, Lorem Ipsum is not simply random text. It has roots in a piece of classical Latin literature from 45 BC, making it over 2000 years old. Richard McClintock, a Latin professor at Hampden-Sydney College in Virginia, looked up one of the more obscure Latin words, consectetur, from a Lorem Ipsum passage, and going through the cites of the word in classical literature, discovered the undoubtable source. Lorem Ipsum comes from sections 1.10.32 and 1.10.33 of "de Finibus Bonorum et Malorum" (The Extremes of Good and Evil) by Cicero, written in 45 BC. This book is a treatise on the theory of ethics, very popular during the Renaissance. The first line of Lorem Ipsum, "Lorem ipsum dolor sit amet..", comes from a line in section 1.10.32.
-
-                            The standard chunk of Lorem Ipsum used since the 1500s is reproduced below for those interested. Sections 1.10.32 and 1.10.33 from "de Finibus Bonorum et Malorum" by Cicero are also reproduced in their exact original form, accompanied by English versions from the 1914 translation by H. Rackham.
-                            Contrary to popular belief, Lorem Ipsum is not simply random text. It has roots in a piece of classical Latin literature from 45 BC, making it over 2000 years old. Richard McClintock, a Latin professor at Hampden-Sydney College in Virginia, looked up one of the more obscure Latin words, consectetur, from a Lorem Ipsum passage, and going through the cites of the word in classical literature, discovered the undoubtable source. Lorem Ipsum comes from sections 1.10.32 and 1.10.33 of "de Finibus Bonorum et Malorum" (The Extremes of Good and Evil) by Cicero, written in 45 BC. This book is a treatise on the theory of ethics, very popular during the Renaissance. The first line of Lorem Ipsum, "Lorem ipsum dolor sit amet..", comes from a line in section 1.10.32.
-
-                            The standard chunk of Lorem Ipsum used since the 1500s is reproduced below for those interested. Sections 1.10.32 and 1.10.33 from "de Finibus Bonorum et Malorum" by Cicero are also reproduced in their exact original form, accompanied by English versions from the 1914 translation by H. Rackham.
+                            Lorem Ipsum is simply dummy text of the printing and typesetting industry. 
+                            Lorem Ipsum has been the industry's standard dummy text ever since the 1500s, when an unknown printer took a galley of type and scrambled it to make a type specimen book. 
+                            It has survived not only five centuries, but also the leap into electronic typesetting, remaining essentially unchanged. 
+                            It was popularised in the 1960s with the release of Letraset sheets containing Lorem Ipsum passages, and more recently with desktop publishing software like Aldus PageMaker including versions of Lorem Ipsum.
                         </Text>
                     </ScrollView>
                 </View>
@@ -52,14 +76,28 @@ export default function ExibirTicket({ route, navigation }) {
                         ))}
                     </View>
                 </View>
+                {showChatBalloon && (
+                    <View style={styles.section}>
+                        <Text style={styles.subtitulo}>Assumido por: <Text style={styles.autor}>Ana Letícia</Text></Text>
+                    </View>
+                )}
             </ScrollView>
 
-            
-            <View style={styles.chatBalloonContainer}>
-                <TouchableOpacity onPress={() => navigation.navigate('Chat')}>
-                    <Ionicons name="chatbubble-ellipses-outline" size={30} color="#fff" />
-                </TouchableOpacity>
-            </View>
+            {!showChatBalloon && (
+                <View style={styles.chatBalloonLeftContainer}>
+                    <TouchableOpacity onPress={handleAssumirTicket}>
+                        <Ionicons name="enter-sharp" size={30} color="#fff" />
+                    </TouchableOpacity>
+                </View>
+            )}
+
+            {showChatBalloon && (
+                <View style={styles.chatBalloonRightContainer}>
+                    <TouchableOpacity onPress={() => navigation.navigate('Chat')}>
+                        <Ionicons name="chatbubble-ellipses-outline" size={30} color="#fff" />
+                    </TouchableOpacity>
+                </View>
+            )}
         </View>
     );
 }
@@ -84,9 +122,6 @@ const styles = StyleSheet.create({
         fontWeight: 'bold',
         color: 'white',
         textAlign: "center",
-    },
-    modos: {
-        marginLeft: 10,
     },
     ticketContainer: {
         paddingHorizontal: 25,
@@ -146,7 +181,15 @@ const styles = StyleSheet.create({
         textDecorationLine: 'underline',
         fontSize: 14,
     },
-    chatBalloonContainer: {
+    chatBalloonLeftContainer: {
+        position: 'absolute',
+        bottom: 20,
+        left: 20,
+        backgroundColor: '#696CFF',
+        borderRadius: 50,
+        padding: 10,
+    },
+    chatBalloonRightContainer: {
         position: 'absolute',
         bottom: 20,
         right: 20,
@@ -155,3 +198,4 @@ const styles = StyleSheet.create({
         padding: 10,
     },
 });
+
