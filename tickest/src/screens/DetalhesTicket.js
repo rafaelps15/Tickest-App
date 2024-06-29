@@ -1,16 +1,41 @@
-import React, { useState } from "react";
+import React, { useState, useContext, useEffect } from 'react';
 import { ScrollView, StatusBar, StyleSheet, Text, View, TouchableOpacity, Alert } from "react-native";
 import Ionicons from '@expo/vector-icons/Ionicons';
-
+import {getTicket} from '../../services/Ticket';
+import { API_BASE_URL } from '../../env';
+import { AuthContext } from '../../services/AuthContext'
 export default function ExibirTicket({ route, navigation }) {
-    const { titulo, area, descricao } = route.params;
-
-    const anexos = [
-        { nome: "Anexo.zip", url: "https://example.com/anexo1.pdf" },
-        { nome: "Anexo.docx", url: "https://example.com/anexo2.pdf" }
-    ];
-
+    const { TicketId } = route.params;
     const [showChatBalloon, setShowChatBalloon] = useState(false);
+    const [ticket, setTicket] = useState([]);
+    const { user } = useContext(AuthContext);
+    useEffect(() => {
+      fetchTicket(TicketId); 
+
+
+
+    }, []);
+
+
+
+    async function fetchTicket(ticket_id){
+        try{
+            const data = await getTicket(ticket_id);
+            setTicket(data.ticket);
+            console.log(data.ticket.destinatarioId);
+                   
+        if(data.ticket.destinatarioId == user.id ){
+            setShowChatBalloon(true);
+        }
+        }catch(error){
+            console.log(error);
+        }
+    }
+
+    
+
+
+   
 
     const handleAssumirTicket = () => {
         Alert.alert(
@@ -32,7 +57,8 @@ export default function ExibirTicket({ route, navigation }) {
             ]
         );
     };
-
+    if(!ticket.usuario) return null;
+    if(!ticket.anexos) return null;
     return (
         <View style={styles.container}>
             <StatusBar translucent backgroundColor="#696CFF" />
@@ -42,16 +68,16 @@ export default function ExibirTicket({ route, navigation }) {
 
             <ScrollView contentContainerStyle={styles.ticketContainer}>
                 <View style={styles.section}>
-                    <Text style={styles.label}>Título</Text>
+                    <Text style={styles.label}>{ticket.título}</Text>
                 </View>
                 <View style={styles.section}>
-                    <Text style={styles.subtitulo}>Criado em: <Text style={styles.data}>24/05/2024</Text></Text>
+                    <Text style={styles.subtitulo}>Criado em: <Text style={styles.data}>{ticket.data_Criação}</Text></Text>
                 </View>
                 <View style={styles.section}>
-                    <Text style={styles.subtitulo}>Criado por: <Text style={styles.autor}>Maria Alberto</Text></Text>
+                    <Text style={styles.subtitulo}>Criado por: <Text style={styles.autor}>{ticket.usuario.nome}</Text></Text>
                 </View>
                 <View style={styles.section}>
-                    <Text style={styles.subtitulo}>Status: <Text style={styles.data}>Em análise</Text></Text>
+                    <Text style={styles.subtitulo}>Status: <Text style={styles.data}>{ticket.status_nome}</Text></Text>
                 </View>
                 <View style={styles.section}>
                     <Text style={styles.descricao}>Descrição</Text>
@@ -59,26 +85,23 @@ export default function ExibirTicket({ route, navigation }) {
                 <View style={styles.descricaoContainer}>
                     <ScrollView contentContainerStyle={styles.descricaoScrollContent}>
                         <Text style={styles.descricaoTexto}>
-                            Lorem Ipsum is simply dummy text of the printing and typesetting industry. 
-                            Lorem Ipsum has been the industry's standard dummy text ever since the 1500s, when an unknown printer took a galley of type and scrambled it to make a type specimen book. 
-                            It has survived not only five centuries, but also the leap into electronic typesetting, remaining essentially unchanged. 
-                            It was popularised in the 1960s with the release of Letraset sheets containing Lorem Ipsum passages, and more recently with desktop publishing software like Aldus PageMaker including versions of Lorem Ipsum.
+                        {ticket.descrição}
                         </Text>
                     </ScrollView>
                 </View>
                 <View style={styles.section}>
                     <Text style={styles.descricao}>Anexos</Text>
                     <View style={styles.anexosContainer}>
-                        {anexos.map((anexo, index) => (
-                            <TouchableOpacity key={index} onPress={() => console.log(`Download ${anexo.url}`)}>
-                                <Text style={styles.anexoText}>{anexo.nome}</Text>
+                        {ticket.anexos.map((anexo, index) => (
+                            <TouchableOpacity key={index} onPress={() => console.log(`Download ${API_BASE_URL+"/"+anexo.endereco}`)}>
+                                <Text style={styles.anexoText}>{anexo.endereco}</Text>
                             </TouchableOpacity>
                         ))}
                     </View>
                 </View>
                 {showChatBalloon && (
                     <View style={styles.section}>
-                        <Text style={styles.subtitulo}>Assumido por: <Text style={styles.autor}>Ana Letícia</Text></Text>
+                        <Text style={styles.subtitulo}>Assumido por: <Text style={styles.autor}>{user.nome}</Text></Text>
                     </View>
                 )}
             </ScrollView>
@@ -93,7 +116,7 @@ export default function ExibirTicket({ route, navigation }) {
 
             {showChatBalloon && (
                 <View style={styles.chatBalloonRightContainer}>
-                    <TouchableOpacity onPress={() => navigation.navigate('Chat')}>
+                    <TouchableOpacity onPress={() => navigation.navigate('Chat', { ticket_id: TicketId })}>
                         <Ionicons name="chatbubble-ellipses-outline" size={30} color="#fff" />
                     </TouchableOpacity>
                 </View>

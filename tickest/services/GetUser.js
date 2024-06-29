@@ -1,8 +1,8 @@
 import axios from "axios";
-
+import { API_BASE_URL } from '../env';
 export async function getLogin(email, password) {
     try {
-      const response = await axios.post(`http://192.168.0.157:5000/API/App/Login`, {
+      const response = await axios.post(`${API_BASE_URL}/API/App/Login`, {
         email: email,
         senha: password
       });

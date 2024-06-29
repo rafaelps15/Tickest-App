@@ -1,30 +1,101 @@
-import React, { useState, useRef, useEffect } from 'react';
+import React, { useState, useContext, useEffect, useRef } from 'react';
 import { View, Text, TextInput, StyleSheet, ScrollView, TouchableOpacity, KeyboardAvoidingView, Platform } from 'react-native';
-
-export default function Chat() {
+import {getTicketMessages} from '../../services/Ticket';
+import { AuthContext } from '../../services/AuthContext'
+import { API_BASE_URL } from '../../env';
+import axios from 'axios';
+import * as signalR from '@microsoft/signalr';
+export default function Chat({ route, navigation }) {
+    const [connection, setConnection] = useState(null);
     const [message, setMessage] = useState('');
     const [messages, setMessages] = useState([]);
-
+    const { ticket_id } = route.params;
+    const [group, setGroup] = useState("Group-"+ticket_id); // Nome do grupo
+    const { user } = useContext(AuthContext);
     const scrollViewRef = useRef();
+    useEffect(() => {
+        const newConnection = new signalR.HubConnectionBuilder()
+            .withUrl(`${API_BASE_URL}/chatHub`)
+            .withAutomaticReconnect()
+            .build();
 
+        setConnection(newConnection);
+    }, []);
+    useEffect(() => {
+        if (connection) {
+            connection.start()
+                .then(result => {
+                    console.log('Connected!');
+
+                    connection.on('ReceiveGroupMessage', (message) => {
+                        setMessages(prevMessages => [...prevMessages, {
+                            id: prevMessages.length,
+                            text: message.message,
+                            sender: message.from_id === user.id ? 'user' : 'other',
+                            senderName: message.from.toString(),
+                            timestamp: new Date(message.dateTime)
+                          }]);
+                    });
+
+                    connection.send('JoinGroup', group);
+                })
+                .catch(e => console.log('Connection failed: ', e));
+        }
+    }, [connection]);
+    useEffect(() => {
+        fetchMessages(ticket_id); 
+  
+  
+  
+      }, []);
+
+      async function fetchMessages(ticket_id){
+        try{
+            const data = await getTicketMessages(ticket_id);
+            const messages2 = data.messages;
+            console.log(messages2);
+            if (messages2 && messages2.length > 0) {
+                setMessages(messages2.map((msg, index) => ({
+                  id: index,
+                  text: msg.msg_content,
+                  sender: msg.user_id_from === user.id ? 'user' : 'other',
+                  senderName: msg.user_id_from === user.id ? user.name : msg.user_from.nome,
+                  timestamp: msg.dataHora
+                })));
+              } else {
+                setMessages([]);
+              }
+
+        }catch(error){
+            console.log(error);
+        }
+    }
+  
     useEffect(() => {
         // Scroll para a última mensagem ao carregar
         scrollViewRef.current.scrollToEnd({ animated: true });
     }, [messages]);
 
-    useEffect(() => {
-        // Adiciona mensagem de exemplo
-        const exampleMessage = { id: 0, text: 'Olá, tudo bem?', sender: 'other', senderName: 'Maria Alberto' };
-        setMessages([exampleMessage]);
-    }, []);
 
-    const handleMessageSend = () => {
+
+    const handleMessageSend = async () => {
         if (message.trim() === '') return;
-        const newMessage = { id: messages.length, text: message, sender: 'user' };
-        setMessages([...messages, newMessage]);
-        setMessage('');
-    };
+        try {
+            const data = {
+              from: user.id,
+              ticket_id: ticket_id, 
+              msg: message,
+            };
+      
+            const response = await axios.post(`${API_BASE_URL}/enviarMobile`, data);
+      
+            setMessage('');
 
+          } catch (error) {
+            console.error('Erro ao enviar mensagem:', error);
+          }
+    };
+    if(!messages) return null;
     return (
         <View style={styles.container}>
             <View style={styles.header}>
@@ -36,7 +107,7 @@ export default function Chat() {
                 onContentSizeChange={() => scrollViewRef.current.scrollToEnd({ animated: true })}
             >
                 {messages.map((msg, index) => (
-                    <Message key={msg.id} text={msg.text} sender={msg.sender} senderName={msg.senderName} index={index} />
+                    <Message key={msg.id} text={msg.text} sender={msg.sender} senderName={msg.senderName} index={index} timestamp={msg.timestamp} />
                 ))}
             </ScrollView>
             <KeyboardAvoidingView
@@ -56,24 +127,32 @@ export default function Chat() {
             </KeyboardAvoidingView>
         </View>
     );
+    
 }
-
-const Message = ({ text, sender, senderName, index }) => {
+const Message = ({ text, sender, senderName, index,timestamp }) => {
     const isUser = sender === 'user';
     const messageStyle = isUser ? styles.userMessage : styles.otherMessage;
     const messageTextColor = isUser ? 'white' : 'black';
-    const showSenderName = !isUser && (index === 0 || messages[index - 1]?.sender !== 'other');
-
+    const showSenderName = !isUser;
+    const formattedTime = timestamp ? formatTime(timestamp) : '';
     return (
         <View>
             {showSenderName && <Text style={styles.senderName}>{senderName}</Text>}
             <View style={[styles.messageContainer, messageStyle]}>
                 <Text style={[styles.messageText, { color: messageTextColor }]}>{text}</Text>
+                <Text style={[styles.timestamp, { color: messageTextColor }]}>{formattedTime}</Text>
             </View>
         </View>
     );
 };
 
+const formatTime = (timestamp) => {
+    const date = new Date(timestamp);
+    const hours = date.getHours();
+    const minutes = date.getMinutes();
+    return `${hours}:${minutes < 10 ? '0' : ''}${minutes}`;
+  };
+  
 const styles = StyleSheet.create({
     container: {
         flex: 1,
@@ -156,4 +235,11 @@ const styles = StyleSheet.create({
         fontWeight: 'bold',
         fontSize: 16,
     },
+    timestamp: {
+        fontSize: 10,
+        color: '#888',
+        alignSelf: 'flex-end',
+        marginTop: 3,
+        marginLeft: 10,
+      },
 });
