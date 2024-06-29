@@ -1,16 +1,39 @@
 import { View, Text, StyleSheet, ScrollView, TextInput, Pressable } from 'react-native'
-import React, { useRef, useState } from 'react'
+import React, { useContext, useRef, useState } from 'react'
 import Ionicons from '@expo/vector-icons/Ionicons'
 import { useSafeAreaInsets } from 'react-native-safe-area-context'
 import Resumo from './Resumo'
 import { Ticket } from '../components/ticket'
 import { StatusBar } from 'expo-status-bar'
+import { FlatList } from 'react-native-gesture-handler'
+import { AuthContext } from '../../services/AuthContext'
 
 const Home = () => {
-    const { top } = useSafeAreaInsets()
-    const paddingTop = top > 0 ? top + 10 : 30
-    const [search, setSearch] = useState('')
-    const searchInputRef = useRef(null)
+    const { top } = useSafeAreaInsets();
+    const paddingTop = top > 0 ? top + 10 : 30;
+    const [search, setSearch] = useState('');
+    const searchInputRef = useRef(null);
+    const { user } = useContext(AuthContext);
+    const ticketsCriados = user.ticketsCriados;
+
+    const renderItem = ({ item }) => (
+        <View style={styles.ticketContainer}>
+            <Ticket titulo={item.titulo} area={item.area} etapa={item.etapa} borderRightColor="#999999"></Ticket>
+ 
+
+
+
+{/* 
+            <Ticket titulo="Atualização de sistema" area="RH" etapa="Em análise" borderRightColor="#999999" />
+            <Ticket titulo="Integração de dados" area="Financeiro" etapa="Em desenvolvimento" borderRightColor="#e6b13e" />
+            <Ticket titulo="Otimização de site" area="Marketing" etapa="Concluído" borderRightColor="#6aa84f" />
+            <Ticket titulo="Permissões de segurança" area="Jurídico" etapa="Cancelado" borderRightColor="#f44336" />
+            <Ticket titulo="Migração de dados" area="Compras" etapa="Em análise" borderRightColor="#999999" />
+            <Ticket titulo="Configuração de software" area="Produção" etapa="Cancelado" borderRightColor="#f44336" />
+            <Ticket titulo="Backup de dados" area="Desenvolvimento de Produto" etapa="Concluído" borderRightColor="#6aa84f" /> */}
+          
+        </View>
+    );
 
     return (
         <View style={styles.container}>
@@ -43,14 +66,16 @@ const Home = () => {
                     <Resumo />
                 </View>
                 <View style={styles.tickets}>
-                    <Ticket titulo="Atualização de sistema" area="RH" etapa="Em análise" borderRightColor="#999999" />
-                    <Ticket titulo="Integração de dados" area="Financeiro" etapa="Em desenvolvimento" borderRightColor="#e6b13e" />
-                    <Ticket titulo="Otimização de site" area="Marketing" etapa="Concluído" borderRightColor="#6aa84f" />
-                    <Ticket titulo="Permissões de segurança" area="Jurídico" etapa="Cancelado" borderRightColor="#f44336" />
-                    <Ticket titulo="Migração de dados" area="Compras" etapa="Em análise" borderRightColor="#999999" />
-                    <Ticket titulo="Configuração de software" area="Produção" etapa="Cancelado" borderRightColor="#f44336" />
-                    <Ticket titulo="Backup de dados" area="Desenvolvimento de Produto" etapa="Concluído" borderRightColor="#6aa84f" />
+                    <FlatList
+                    data={ticketsCriados}
+                    renderItem={renderItem}
+                    keyExtractor={(item) => item.id.toString()}
+                    contentContainerStyle={{ flexGrow: 1 }}
+                    />
                 </View>
+                {/* {/* <FlatList data={user}>
+                    
+                </FlatList> */}
             </ScrollView>
         </View>
     )
