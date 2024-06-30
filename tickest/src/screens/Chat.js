@@ -14,15 +14,35 @@ export default function Chat() {
 
     useEffect(() => {
         // Adiciona mensagem de exemplo
-        const exampleMessage = { id: 0, text: 'Olá, tudo bem?', sender: 'other', senderName: 'Maria Alberto' };
+        const exampleMessage = { 
+            id: 0, 
+            text: 'Olá, tudo bem?', 
+            sender: 'other', 
+            senderName: 'Maria Alberto',
+            timestamp: new Date(),
+            date: new Date().toLocaleDateString('pt-BR'),
+        };
         setMessages([exampleMessage]);
     }, []);
 
     const handleMessageSend = () => {
         if (message.trim() === '') return;
-        const newMessage = { id: messages.length, text: message, sender: 'user' };
+        const newMessage = { 
+            id: messages.length, 
+            text: message, 
+            sender: 'user',
+            timestamp: new Date(),
+            date: new Date().toLocaleDateString('pt-BR'),
+        };
         setMessages([...messages, newMessage]);
         setMessage('');
+    };
+
+    const formatTime = (timestamp) => {
+        const date = new Date(timestamp);
+        const hours = date.getHours().toString().padStart(2, '0');
+        const minutes = date.getMinutes().toString().padStart(2, '0');
+        return `${hours}:${minutes}`;
     };
 
     return (
@@ -36,7 +56,16 @@ export default function Chat() {
                 onContentSizeChange={() => scrollViewRef.current.scrollToEnd({ animated: true })}
             >
                 {messages.map((msg, index) => (
-                    <Message key={msg.id} text={msg.text} sender={msg.sender} senderName={msg.senderName} index={index} />
+                    <View key={msg.id}>
+                        <Text style={styles.senderName}>{msg.senderName}</Text>
+                        <View style={[styles.messageContainer, msg.sender === 'user' ? styles.userMessage : styles.otherMessage]}>
+                            <Text style={[styles.messageText, msg.sender === 'user' ? styles.userText : null]}>{msg.text}</Text>
+                            <View style={styles.messageFooter}>
+                                <Text style={[styles.timestamp, msg.sender === 'user' ? styles.userText : null]}>{formatTime(msg.timestamp)}</Text>
+                                <Text style={[styles.dateTime, msg.sender === 'user' ? styles.userText : null]}>{`\u00A0\u00A0${msg.date}`}</Text>
+                            </View>
+                        </View>
+                    </View>
                 ))}
             </ScrollView>
             <KeyboardAvoidingView
@@ -58,22 +87,6 @@ export default function Chat() {
     );
 }
 
-const Message = ({ text, sender, senderName, index }) => {
-    const isUser = sender === 'user';
-    const messageStyle = isUser ? styles.userMessage : styles.otherMessage;
-    const messageTextColor = isUser ? 'white' : 'black';
-    const showSenderName = !isUser && (index === 0 || messages[index - 1]?.sender !== 'other');
-
-    return (
-        <View>
-            {showSenderName && <Text style={styles.senderName}>{senderName}</Text>}
-            <View style={[styles.messageContainer, messageStyle]}>
-                <Text style={[styles.messageText, { color: messageTextColor }]}>{text}</Text>
-            </View>
-        </View>
-    );
-};
-
 const styles = StyleSheet.create({
     container: {
         flex: 1,
@@ -89,17 +102,15 @@ const styles = StyleSheet.create({
         justifyContent: 'center',
         marginBottom: 20,
     },
-
     title: {
         fontSize: 17,
         fontWeight: 'bold',
         color: 'white',
-        textAlign: "center",
+        textAlign: 'center',
     },
-
     messagesContainer: {
-        paddingTop: 10,
         paddingHorizontal: 20,
+        paddingBottom: 20,
     },
     messageContainer: {
         maxWidth: '80%',
@@ -113,7 +124,6 @@ const styles = StyleSheet.create({
     userMessage: {
         alignSelf: 'flex-end',
         backgroundColor: '#696CFF',
-        marginTop: 0, // Removendo espaço acima do balão do usuário
     },
     otherMessage: {
         alignSelf: 'flex-start',
@@ -121,12 +131,30 @@ const styles = StyleSheet.create({
     },
     messageText: {
         fontSize: 16,
+        color: 'black', // Cor da letra padrão para mensagens de outros usuários
+    },
+    userText: {
+        color: 'white', // Cor da letra para mensagens do usuário
     },
     senderName: {
         fontSize: 12,
         color: '#888',
         marginBottom: 5,
         marginLeft: 15,
+    },
+    messageFooter: {
+        flexDirection: 'row',
+        justifyContent: 'space-between',
+        alignItems: 'center',
+        marginTop: 5,
+    },
+    timestamp: {
+        fontSize: 12,
+        color: '#888',
+    },
+    dateTime: {
+        fontSize: 12,
+        color: '#888', // Cor da data é a mesma do horário
     },
     inputContainer: {
         flexDirection: 'row',

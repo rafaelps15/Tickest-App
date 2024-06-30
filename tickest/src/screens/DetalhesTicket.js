@@ -1,5 +1,5 @@
 import React, { useState } from "react";
-import { ScrollView, StatusBar, StyleSheet, Text, View, TouchableOpacity, Alert } from "react-native";
+import { ScrollView, StatusBar, StyleSheet, Text, View, TouchableOpacity, Alert, Animated } from "react-native";
 import Ionicons from '@expo/vector-icons/Ionicons';
 
 export default function ExibirTicket({ route, navigation }) {
@@ -11,14 +11,18 @@ export default function ExibirTicket({ route, navigation }) {
     ];
 
     const [showChatBalloon, setShowChatBalloon] = useState(false);
+    const [showPopover, setShowPopover] = useState(false);
+    const [popoverAnimation] = useState(new Animated.Value(0)); // Estado para controlar a animação do popover
+    const [statusTicket, setStatusTicket] = useState('Em análise');
+    const [showButtons, setShowButtons] = useState(true); // Estado para controlar a visibilidade dos botões do popover
 
     const handleAssumirTicket = () => {
         Alert.alert(
-            'Deseja assumir este ticket?',
+            'Assumir ticket?',
             'Você tem certeza que deseja assumir este ticket?',
             [
                 {
-                    text: 'Cancelar',
+                    text: 'Não',
                     onPress: () => console.log('Cancelado'),
                     style: 'cancel'
                 },
@@ -31,6 +35,77 @@ export default function ExibirTicket({ route, navigation }) {
                 }
             ]
         );
+    };
+
+    const handleAdditionalButtonPress = () => {
+        if (showPopover) {
+            hidePopover();
+        } else {
+            setShowPopover(true);
+            // Animação para mostrar o popover
+            Animated.timing(popoverAnimation, {
+                toValue: 1,
+                duration: 300,
+                useNativeDriver: true,
+            }).start();
+        }
+    };
+
+    const handleCheck = () => {
+        // Exibir popup para concluir o ticket
+        Alert.alert(
+            'Concluir este ticket?',
+            'Deseja concluir este ticket?',
+            [
+                {
+                    text: 'Não',
+                    onPress: () => console.log('Cancelado'),
+                    style: 'cancel'
+                },
+                {
+                    text: 'Sim',
+                    onPress: () => {
+                        // Atualiza o status para "Concluído"
+                        setStatusTicket('Concluído');
+                        // Esconde os botões do popover
+                        hidePopover();
+                    }
+                }
+            ]
+        );
+    };
+
+    const handleCancel = () => {
+        // Exibir popup para cancelar o ticket
+        Alert.alert(
+            'Cancelar este ticket?',
+            'Tem certeza que deseja cancelar este ticket?',
+            [
+                {
+                    text: 'Não',
+                    onPress: () => console.log('Cancelado'),
+                    style: 'cancel'
+                },
+                {
+                    text: 'Sim',
+                    onPress: () => {
+                        // Lógica para cancelar o ticket
+                        hidePopover();
+                    }
+                }
+            ]
+        );
+    };
+
+    const hidePopover = () => {
+        // Animação para esconder o popover
+        Animated.timing(popoverAnimation, {
+            toValue: 0,
+            duration: 300,
+            useNativeDriver: true,
+        }).start(() => {
+            setShowPopover(false);
+        });
     };
 
     return (
@@ -51,7 +126,7 @@ export default function ExibirTicket({ route, navigation }) {
                     <Text style={styles.subtitulo}>Criado por: <Text style={styles.autor}>Maria Alberto</Text></Text>
                 </View>
                 <View style={styles.section}>
-                    <Text style={styles.subtitulo}>Status: <Text style={styles.data}>Em análise</Text></Text>
+                    <Text style={styles.subtitulo}>Status: <Text style={styles.data}>{statusTicket}</Text></Text>
                 </View>
                 <View style={styles.section}>
                     <Text style={styles.descricao}>Descrição</Text>
@@ -86,7 +161,7 @@ export default function ExibirTicket({ route, navigation }) {
             {!showChatBalloon && (
                 <View style={styles.chatBalloonLeftContainer}>
                     <TouchableOpacity onPress={handleAssumirTicket}>
-                        <Ionicons name="enter-sharp" size={30} color="#fff" />
+                        <Ionicons name="enter-sharp" size={24} color="#fff" />
                     </TouchableOpacity>
                 </View>
             )}
@@ -94,9 +169,46 @@ export default function ExibirTicket({ route, navigation }) {
             {showChatBalloon && (
                 <View style={styles.chatBalloonRightContainer}>
                     <TouchableOpacity onPress={() => navigation.navigate('Chat')}>
-                        <Ionicons name="chatbubble-ellipses-outline" size={30} color="#fff" />
+                        <Ionicons name="chatbubble-ellipses-outline" size={24} color="#fff" />
                     </TouchableOpacity>
                 </View>
+            )}
+
+            {showChatBalloon && (
+                <View style={styles.additionalButtonContainer}>
+                    <TouchableOpacity onPress={handleAdditionalButtonPress}>
+                        <Ionicons name="newspaper-outline" size={24} color="#fff" />
+                    </TouchableOpacity>
+                </View>
+            )}
+
+            {showPopover && (
+                <Animated.View
+                    style={[
+                        styles.popoverContainer,
+                        {
+                            transform: [
+                                {
+                                    translateX: popoverAnimation.interpolate({
+                                        inputRange: [0, 1],
+                                        outputRange: [0, 1], // Ajuste conforme necessário para o efeito desejado
+                                    }),
+                                },
+                            ],
+                        },
+                    ]}
+                >
+                    {showButtons && (
+                        <>
+                            <TouchableOpacity onPress={handleCheck} style={styles.popoverButton}>
+                                <Ionicons name="checkmark-circle-outline" size={24} color="#fff" />
+                            </TouchableOpacity>
+                            <TouchableOpacity onPress={handleCancel} style={styles.popoverButton}>
+                                <Ionicons name="close-circle-outline" size={24} color="#fff" />
+                            </TouchableOpacity>
+                        </>
+                    )}
+                </Animated.View>
             )}
         </View>
     );
@@ -197,5 +309,29 @@ const styles = StyleSheet.create({
         borderRadius: 50,
         padding: 10,
     },
+    additionalButtonContainer: {
+        position: 'absolute',
+        bottom: 20,
+        left: 20,
+        backgroundColor: '#696CFF',
+        borderRadius: 50,
+        padding: 10,
+    },
+    popoverContainer: {
+        position: 'absolute',
+        bottom: 26.9,
+        left: 58,
+        flexDirection: 'row',
+        backgroundColor: '#696CFF',
+        borderRadius: 0,
+        borderTopRightRadius: 10, // Removendo o border radius do lado direito
+        borderBottomRightRadius: 10, // Removendo o border radius do lado direito
+        paddingLeft: 7,
+        paddingTop: 3,
+        height: 30,
+        width: 100
+    },
+    popoverButton: {
+        marginHorizontal: 9,
+    },
 });
-

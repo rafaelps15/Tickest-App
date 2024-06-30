@@ -7,7 +7,7 @@ const Resumo = () => {
             <ScrollView contentContainerStyle={{ gap: 15 }}>
                 <View style={styles.resumoContainer}>
                     <View style={styles.resumo}>
-                        <Text style={styles.texto}>Em Abertos</Text>
+                        <Text style={styles.texto}>Em análise</Text>
                         <View>
                             <Text style={styles.textoDestaque}>07</Text>
                         </View>
@@ -22,7 +22,7 @@ const Resumo = () => {
 
                 <View style={styles.resumoContainer}>
                     <View style={styles.resumo}>
-                        <Text style={styles.texto}>Abertos este mês</Text>
+                        <Text style={styles.texto}>Em análise este mês</Text>
                         <View>
                             <Text style={styles.textoDestaque}>18</Text>
                         </View>
