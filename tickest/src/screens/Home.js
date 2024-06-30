@@ -1,36 +1,19 @@
 import { View, Text, StyleSheet, ScrollView, TextInput, Pressable,FlatList } from 'react-native'
 import React, { useContext, useRef, useState } from 'react'
 import Ionicons from '@expo/vector-icons/Ionicons'
-import { useSafeAreaInsets } from 'react-native-safe-area-context'
 import Resumo from './Resumo'
 import { Ticket } from '../components/ticket'
 import { StatusBar } from 'expo-status-bar'
 import { AuthContext } from '../../services/AuthContext'
 
 const Home = () => {
-    const { top } = useSafeAreaInsets();
-    const paddingTop = top > 0 ? top + 10 : 30;
     const [search, setSearch] = useState('');
     const searchInputRef = useRef(null);
     const { user } = useContext(AuthContext);
-    const ticketsCriados = user.ticketsRecebidos;
-    console.log(ticketsCriados);
+    const ticketsRecebidos = user.ticketsRecebidos;
     const renderItem = ({ item }) => (
         <View style={styles.ticketContainer}>
             <Ticket titulo={item.título} area={item.area} etapa={item.etapa} ticket_id={item.id} borderRightColor={getBorderColor(item.etapa_id)}></Ticket>
- 
-
-
-
-{/* 
-            <Ticket titulo="Atualização de sistema" area="RH" etapa="Em análise" borderRightColor="#999999" />
-            <Ticket titulo="Integração de dados" area="Financeiro" etapa="Em desenvolvimento" borderRightColor="#e6b13e" />
-            <Ticket titulo="Otimização de site" area="Marketing" etapa="Concluído" borderRightColor="#6aa84f" />
-            <Ticket titulo="Permissões de segurança" area="Jurídico" etapa="Cancelado" borderRightColor="#f44336" />
-            <Ticket titulo="Migração de dados" area="Compras" etapa="Em análise" borderRightColor="#999999" />
-            <Ticket titulo="Configuração de software" area="Produção" etapa="Cancelado" borderRightColor="#f44336" />
-            <Ticket titulo="Backup de dados" area="Desenvolvimento de Produto" etapa="Concluído" borderRightColor="#6aa84f" /> */}
-          
         </View>
     );
 
@@ -55,7 +38,7 @@ const Home = () => {
                             </Pressable> 
                         )}
                     </View>
-                    <Pressable onPress={() => console.log('Filtro')} style={styles.modos}>
+                    <Pressable style={styles.modos}>
                         <Ionicons name="options" size={24} color="#696CFF" />
                     </Pressable>
                 </View>
@@ -66,15 +49,12 @@ const Home = () => {
                 </View>
                 <View style={styles.tickets}>
                     <FlatList
-                    data={ticketsCriados}
+                    data={ticketsRecebidos}
                     renderItem={renderItem}
                     keyExtractor={(item) => item.id.toString()}
                     contentContainerStyle={{ flexGrow: 1 }}
                     />
                 </View>
-                {/* {/* <FlatList data={user}>
-                    
-                </FlatList> */}
             </ScrollView>
         </View>
     )

@@ -44,9 +44,6 @@ export default function Chat({ route, navigation }) {
     }, [connection]);
     useEffect(() => {
         fetchMessages(ticket_id); 
-  
-  
-  
       }, []);
 
       async function fetchMessages(ticket_id){
