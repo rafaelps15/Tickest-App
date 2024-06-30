@@ -6,7 +6,7 @@ import { useNavigation } from '@react-navigation/native';
 export function Ticket(props) {
     const navigation = useNavigation();
     return (
-        <TouchableOpacity onPress={() => navigation.navigate('DetalhesTicket', { TicketId: 10 })} activeOpacity={0.8}>
+        <TouchableOpacity onPress={() => navigation.navigate('DetalhesTicket', { TicketId: props.ticket_id })} activeOpacity={0.8}>
             <Card style={[styles.card, { borderRightColor: props.borderRightColor }]}>
                 <Text style={styles.descricao}>{props.titulo}</Text>
                 <Text style={styles.texto}>{props.area}</Text>

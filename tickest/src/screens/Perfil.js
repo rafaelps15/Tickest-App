@@ -1,6 +1,9 @@
-import React, { useState } from "react";
+import React, { useContext, useState } from 'react'
 import { View, Text, StyleSheet, TouchableOpacity, LayoutAnimation, Platform, UIManager, Alert } from 'react-native';
 import { Ionicons } from '@expo/vector-icons'; 
+import { AuthContext } from "../../services/AuthContext";
+import { GestureHandlerRootView, TouchableOpacity } from 'react-native-gesture-handler'
+import { useNavigation } from "@react-navigation/native";
 
 
 if (Platform.OS === 'android' && UIManager.setLayoutAnimationEnabledExperimental) {
@@ -9,6 +12,12 @@ if (Platform.OS === 'android' && UIManager.setLayoutAnimationEnabledExperimental
 
 export default function Perfil() {
     const [expandedIndex, setExpandedIndex] = useState(null);
+    const { user, signOut } = useContext(AuthContext);
+    const navigation = useNavigation();
+    const buttonLogout = () => {
+        signOut();
+        navigation.navigate("Login");
+    };
 
     const items = [
         { title: 'Cargo', details: 'Detalhes específicos sobre o cargo.' },
@@ -38,7 +47,7 @@ export default function Perfil() {
                 {
                     text: 'Sair',
                     onPress: () => {
-                        
+                        buttonLogout();
                         console.log('Logout confirmed');
                     }
                 }
@@ -48,6 +57,7 @@ export default function Perfil() {
     };
 
     return (
+      <GestureHandlerRootView>
         <View style={styles.container}>
             <View style={styles.header}>
                 <Text style={styles.title}>Perfil</Text>
@@ -77,8 +87,51 @@ export default function Perfil() {
                         )}
                     </View>
                 ))}
+                
+export default function Perfil() {
+    return (
+            <View style={styles.container}>
+                <View style={styles.header}>
+                    <Text style={styles.title}>Perfil</Text>
+                </View>
+                <View style={styles.contentContainer}>
+                    <View style={styles.content}>
+                        <Text style={styles.infoText}>
+                            <Text style={styles.label}>Nome: </Text>
+                            <Text style={styles.info}>{user.nome}</Text>
+                        </Text>
+                        <View style={styles.line}></View>
+
+                        <Text style={styles.infoText}>
+                            <Text style={styles.label}>E-mail: </Text>
+                            <Text style={styles.info}>{user.email}</Text>
+                        </Text>
+                        <View style={styles.line}></View>
+
+                        <Text style={styles.infoText}>
+                            <Text style={styles.label}>Cargo: </Text>
+                            <Text style={styles.info}>{user.cargo}</Text>
+                        </Text>
+                        <View style={styles.line}></View>
+
+                        <Text style={styles.infoText}>
+                            <Text style={styles.label}>Área: </Text>
+                            <Text style={styles.info}>{user.area}</Text>
+                        </Text>
+                        <View style={styles.line}></View>
+
+                        <Text style={styles.infoText}>
+                            <Text style={styles.label}>Departamento: </Text>
+                            <Text style={styles.info}>{user.departamento}</Text>
+                        </Text>
+                        <View style={styles.line}></View>
+                    </View>
+                <TouchableOpacity onPress={buttonLogout}>
+                    <Text>Sair</Text>
+                </TouchableOpacity>
+                </View>
             </View>
-        </View>
+        </GestureHandlerRootView>
     );
 }
 

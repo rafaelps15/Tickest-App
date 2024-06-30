@@ -1,21 +1,23 @@
+import React, { useContext } from 'react'
 import { View, Text, StyleSheet, ScrollView } from 'react-native'
-import React from 'react'
+import { AuthContext } from '../../services/AuthContext'
 
 const Resumo = () => {
+    const { user } = useContext(AuthContext);
     return (
         <View style={styles.container}>
             <ScrollView contentContainerStyle={{ gap: 15 }}>
                 <View style={styles.resumoContainer}>
                     <View style={styles.resumo}>
-                        <Text style={styles.texto}>Em análise</Text>
+                        <Text style={styles.texto}>Em Aberto</Text>
                         <View>
-                            <Text style={styles.textoDestaque}>07</Text>
+                            <Text style={styles.textoDestaque}>{user.ticketsEmAberto}</Text>
                         </View>
                     </View>
                     <View style={styles.resumo}>
                         <Text style={styles.texto}>Concluídos</Text>
                         <View>
-                            <Text style={styles.textoDestaque}>02</Text>
+                            <Text style={styles.textoDestaque}>{user.ticketsConcluidos}</Text>
                         </View>
                     </View>
                 </View>
@@ -24,14 +26,14 @@ const Resumo = () => {
                     <View style={styles.resumo}>
                         <Text style={styles.texto}>Em análise este mês</Text>
                         <View>
-                            <Text style={styles.textoDestaque}>18</Text>
+                            <Text style={styles.textoDestaque}>{user.ticketsAbertosMes}</Text>
                         </View>
                     </View>
 
                     <View style={styles.resumo}>
                         <Text style={styles.texto}>Concluídos este mês</Text>
                         <View>
-                            <Text style={styles.textoDestaque}>14</Text>
+                            <Text style={styles.textoDestaque}>{user.ticketsConcluidosMes}</Text>
                         </View>
                     </View>
                 </View>
