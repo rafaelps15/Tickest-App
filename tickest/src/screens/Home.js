@@ -69,7 +69,7 @@ const Home = () => {
             <StatusBar translucent backgroundColor="#696CFF" />
             <View style={styles.header}>
                 <Text style={styles.title}>Bem-vindo(a), Ana Letícia</Text>
-                <Image source={require("../assets/logo/LogoVaziaBranca.png")} style={styles.logo} />
+                <Image source={require("../assets/logo/2.png")} style={styles.logo} />
                 <View style={styles.searchContainer}>
                     <View style={styles.searchBar}>
                         <TextInput
