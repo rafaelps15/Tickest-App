@@ -5,22 +5,24 @@ import { AuthContext } from '../../services/AuthContext'
 import { API_BASE_URL } from '../../env';
 import axios from 'axios';
 import * as signalR from '@microsoft/signalr';
-export default function Chat({ route, navigation }) {
+
+export default function Chat({ route }) {
     const [connection, setConnection] = useState(null);
     const [message, setMessage] = useState('');
     const [messages, setMessages] = useState([]);
     const { ticket_id } = route.params;
-    const [group, setGroup] = useState("Group-"+ticket_id); // Nome do grupo
+    const [group] = useState("Group-"+ticket_id); // Nome do grupo
     const { user } = useContext(AuthContext);
     const scrollViewRef = useRef();
+
     useEffect(() => {
         const newConnection = new signalR.HubConnectionBuilder()
             .withUrl(`${API_BASE_URL}/chatHub`)
             .withAutomaticReconnect()
             .build();
-
         setConnection(newConnection);
     }, []);
+
     useEffect(() => {
         if (connection) {
             connection.start()
@@ -42,11 +44,9 @@ export default function Chat({ route, navigation }) {
                 .catch(e => console.log('Connection failed: ', e));
         }
     }, [connection]);
+
     useEffect(() => {
         fetchMessages(ticket_id); 
-  
-  
-  
       }, []);
 
       async function fetchMessages(ticket_id){

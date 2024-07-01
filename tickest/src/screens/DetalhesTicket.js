@@ -1,41 +1,34 @@
 import React, { useState, useContext, useEffect } from 'react';
 import { ScrollView, StatusBar, StyleSheet, Text, View, TouchableOpacity, Alert } from "react-native";
 import Ionicons from '@expo/vector-icons/Ionicons';
-import {getTicket} from '../../services/Ticket';
+import { getTicket } from '../../services/Ticket';
 import { API_BASE_URL } from '../../env';
 import { AuthContext } from '../../services/AuthContext'
+import { format } from 'date-fns'
+
 export default function ExibirTicket({ route, navigation }) {
     const { TicketId } = route.params;
     const [showChatBalloon, setShowChatBalloon] = useState(false);
     const [ticket, setTicket] = useState([]);
     const { user } = useContext(AuthContext);
+    const [data_Criação, setDate] = useState('');
+
     useEffect(() => {
       fetchTicket(TicketId); 
-
-
-
     }, []);
-
-
 
     async function fetchTicket(ticket_id){
         try{
             const data = await getTicket(ticket_id);
             setTicket(data.ticket);
-            console.log(data.ticket.destinatarioId);
-                   
-        if(data.ticket.destinatarioId == user.id ){
-            setShowChatBalloon(true);
-        }
+            setDate(format(data.ticket.data_Criação, 'dd/MM/yyyy')); 
+            if(data.ticket.destinatarioId == user.id ){
+                setShowChatBalloon(true);
+            }
         }catch(error){
             console.log(error);
         }
     }
-
-    
-
-
-   
 
     const handleAssumirTicket = () => {
         Alert.alert(
@@ -71,7 +64,7 @@ export default function ExibirTicket({ route, navigation }) {
                     <Text style={styles.label}>{ticket.título}</Text>
                 </View>
                 <View style={styles.section}>
-                    <Text style={styles.subtitulo}>Criado em: <Text style={styles.data}>{ticket.data_Criação}</Text></Text>
+                    <Text style={styles.subtitulo}>Criado em: <Text style={styles.data}>{data_Criação}</Text></Text>
                 </View>
                 <View style={styles.section}>
                     <Text style={styles.subtitulo}>Criado por: <Text style={styles.autor}>{ticket.usuario.nome}</Text></Text>
@@ -221,4 +214,3 @@ const styles = StyleSheet.create({
         padding: 10,
     },
 });
-

@@ -1,12 +1,12 @@
 import axios from "axios";
 import { API_BASE_URL } from '../env';
+
 export async function getLogin(email, password) {
     try {
       const response = await axios.post(`${API_BASE_URL}/API/App/Login`, {
         email: email,
         senha: password
       });
-      
       return response.data;
     } catch (error) {
       if (error.response && error.response.data) {

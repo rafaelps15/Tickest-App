@@ -1,5 +1,5 @@
 import React, { useContext, useState } from "react";
-import { Text, View, StyleSheet, TextInput, TouchableOpacity, Image, StatusBar, Pressable } from "react-native";
+import { Text, View, StyleSheet, TextInput, TouchableOpacity, Image } from "react-native";
 import { Checkbox } from "react-native-paper";
 import { Ionicons } from "@expo/vector-icons";
 import { getStatusBarHeight } from "react-native-status-bar-height";
@@ -12,8 +12,11 @@ export default function Login() {
   const [senhaVisivel, setSenhaVisivel] = useState(false);
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
-  const { signIn } = useContext(AuthContext);
+  const { user } = useContext(AuthContext);
   const navigation = useNavigation();
+  if (user) {
+    navigation.navigate("Tabs");
+  }
   const buttonLogin = async() => {
     try{
       const userData = await getLogin(email,password);
